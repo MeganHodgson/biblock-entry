@@ -315,6 +315,41 @@ contract AthleteRegistration is SepoliaConfig {
         athleteRegistrations[athlete].decrypted = true;
     }
 
+    /// @notice Get decrypted athlete information (only available after decryption)
+    /// @param athlete The athlete address
+    /// @return name Decrypted name
+    /// @return age Decrypted age
+    /// @return contact Decrypted contact
+    /// @return sportCategory Sport category (from encrypted data)
+    /// @return isDecrypted Whether data has been decrypted
+    function getDecryptedAthleteInfo(address athlete)
+        external
+        view
+        returns (
+            string memory name,
+            uint256 age,
+            uint256 contact,
+            uint256 sportCategory,
+            bool isDecrypted
+        )
+    {
+        require(athleteRegistrations[athlete].isRegistered, "Athlete not registered");
+
+        AthleteInfo storage info = athleteRegistrations[athlete];
+
+        // For sportCategory, we need to return the enum value
+        // Since we can't decrypt euint32 here, we'll return a placeholder
+        // The frontend should use the original sportCategory from form data
+        uint256 categoryValue = 0; // Placeholder
+
+        return (
+            info.decryptedName,
+            info.decryptedAge,
+            info.decryptedContact,
+            categoryValue,
+            info.decrypted
+        );
+    }
 
     /// @notice Get plain text athlete information (only for local testing - no encryption)
     /// @param athlete The athlete address
@@ -354,5 +389,62 @@ contract AthleteRegistration is SepoliaConfig {
 
         // Emit an event to confirm decryption request
         emit AthleteRegistered(msg.sender, block.timestamp);
+    }
+
+    /// @notice Register multiple athletes in a single transaction
+    /// @param athletes Array of athlete addresses to register
+    /// @param encryptedNames Array of encrypted athlete names
+    /// @param encryptedAges Array of encrypted athlete ages
+    /// @param encryptedContacts Array of encrypted athlete contacts
+    /// @param encryptedCategories Array of encrypted sport categories
+    /// @param inputProof The FHE input proof for all encrypted values
+    function batchRegisterAthletes(
+        address[] calldata athletes,
+        externalEuint32[] calldata encryptedNames,
+        externalEuint32[] calldata encryptedAges,
+        externalEuint32[] calldata encryptedContacts,
+        externalEuint32[] calldata encryptedCategories,
+        bytes calldata inputProof
+    ) external {
+        require(athletes.length == encryptedNames.length, "Array length mismatch");
+        require(athletes.length == encryptedAges.length, "Array length mismatch");
+        require(athletes.length == encryptedContacts.length, "Array length mismatch");
+        require(athletes.length == encryptedCategories.length, "Array length mismatch");
+        require(athletes.length > 0, "Cannot register empty batch");
+        require(athletes.length <= 10, "Batch size limited to 10 athletes for gas efficiency");
+
+        for (uint256 i = 0; i < athletes.length; i++) {
+            address athlete = athletes[i];
+            require(!athleteRegistrations[athlete].isRegistered, "Athlete already registered");
+
+            // Convert external ciphertexts to internal encrypted types
+            euint32 encryptedName = FHE.fromExternal(encryptedNames[i], inputProof);
+            euint32 encryptedAge = FHE.fromExternal(encryptedAges[i], inputProof);
+            euint32 encryptedContact = FHE.fromExternal(encryptedContacts[i], inputProof);
+            euint32 encryptedCategory = FHE.fromExternal(encryptedCategories[i], inputProof);
+
+            // Store encrypted data
+            athleteRegistrations[athlete] = AthleteInfo({
+                encryptedName: encryptedName,
+                encryptedAge: encryptedAge,
+                encryptedContact: encryptedContact,
+                encryptedCategory: encryptedCategory,
+                registrationTimestamp: block.timestamp,
+                isRegistered: true,
+                decryptedName: "",
+                decryptedAge: 0,
+                decryptedContact: 0,
+                decrypted: false,
+                plainName: "",
+                plainAge: 0,
+                plainContact: 0,
+                plainCategory: SportCategory(0)
+            });
+
+            // Track registered athlete
+            registeredAthletes.push(athlete);
+
+            emit AthleteRegistered(athlete, block.timestamp);
+        }
     }
 }
