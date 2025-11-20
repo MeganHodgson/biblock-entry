@@ -447,4 +447,38 @@ contract AthleteRegistration is SepoliaConfig {
             emit AthleteRegistered(athlete, block.timestamp);
         }
     }
+
+    /// @notice Get athlete registration statistics
+    /// @return totalAthletes Total number of registered athletes
+    /// @return decryptedCount Number of athletes with decrypted data
+    /// @return averageRegistrationTime Average time between registrations
+    function getRegistrationStatistics()
+        external
+        view
+        returns (uint256 totalAthletes, uint256 decryptedCount, uint256 averageRegistrationTime)
+    {
+        totalAthletes = registeredAthletes.length;
+
+        uint256 decrypted = 0;
+        for (uint256 i = 0; i < totalAthletes; i++) {
+            if (athleteRegistrations[registeredAthletes[i]].decrypted) {
+                decrypted++;
+            }
+        }
+        decryptedCount = decrypted;
+
+        if (totalAthletes > 1) {
+            uint256 totalTime = 0;
+            for (uint256 i = 1; i < totalAthletes; i++) {
+                uint256 time1 = athleteRegistrations[registeredAthletes[i-1]].registrationTimestamp;
+                uint256 time2 = athleteRegistrations[registeredAthletes[i]].registrationTimestamp;
+                totalTime += time2 - time1;
+            }
+            averageRegistrationTime = totalTime / (totalAthletes - 1);
+        } else {
+            averageRegistrationTime = 0;
+        }
+
+        return (totalAthletes, decryptedCount, averageRegistrationTime);
+    }
 }
