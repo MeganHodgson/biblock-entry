@@ -482,4 +482,10 @@ contract AthleteRegistration is SepoliaConfig {
 
         return (totalAthletes, decryptedCount, averageRegistrationTime);
     }
+
+    /// @notice Get current contract version
+    /// @return Version string
+    function version() external pure returns (string memory) {
+        return "1.0.0";
+    }
 }
