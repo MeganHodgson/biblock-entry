@@ -7,6 +7,7 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 /// @title Athlete Registration Contract with FHE
 /// @notice Privacy-preserving athlete registration system using Fully Homomorphic Encryption
 /// @dev Implements encrypted athlete data storage with age validation for sport categories
+/// Enhanced with batch operations and comprehensive registration analytics
 contract AthleteRegistration is SepoliaConfig {
     /// @notice Sport category definitions
     enum SportCategory {
