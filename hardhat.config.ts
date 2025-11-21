@@ -63,6 +63,12 @@ const config: HardhatUserConfig = {
     tests: "./test",
   },
 
+  typechain: {
+    outDir: "types",
+    target: "ethers-v6",
+    // FHE-specific typechain optimizations
+  },
+
   gasReporter: {
     currency: "USD",
     enabled: process.env.REPORT_GAS ? true : false,
