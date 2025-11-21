@@ -356,9 +356,7 @@ describe("AthleteRegistration", function () {
   });
 
   it("should validate contract version information", async function () {
-    // This test verifies that the contract has version information
-    // Since the contract doesn't have a version function in this implementation,
-    // we'll test that the contract deploys successfully
-    expect(await contract.getAddress()).to.be.a("string");
+    const version = await contract.version();
+    expect(version).to.equal("1.0.0");
   });
 });
