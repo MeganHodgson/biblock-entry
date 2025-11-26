@@ -8,7 +8,7 @@ This template also illustrates how to run your FHEVM-dApp on both Sepolia as wel
 
 ## 🔗 Links
 
-- **📹 Demo Video**: [Watch on GitHub](https://github.com/MeganHodgson/biblock-entry/blob/main/biblock-entry.mp4)
+- **📹 Demo Video**: [Watch on GitHub](https://github.com/MeganHodgson/biblock-entry/blob/main/bibentry.mp4)
 - **🌐 Live Demo**: [View on Vercel](https://bibentry.vercel.app/)
 
 > [!IMPORTANT]
