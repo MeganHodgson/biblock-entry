@@ -67,21 +67,6 @@ async function main() {
       fs.mkdirSync(frontendAbiDir, { recursive: true });
     }
 
-    // Update ABI file
-    const frontendAbiFile = path.join(frontendAbiDir, 'AthleteRegistrationABI.ts');
-    const abiContent = `export const AthleteRegistrationABI = ${JSON.stringify({ abi: AthleteRegistration.interface.format('json') }, null, 2)} as const;\n`;
-    fs.writeFileSync(frontendAbiFile, abiContent);
-    console.log(`✅ Updated frontend ABI: ${frontendAbiFile}`);
-
-    // Update addresses file
-    const frontendAddressesFile = path.join(frontendAbiDir, 'AthleteRegistrationAddresses.ts');
-    const addressesContent = `export const AthleteRegistrationAddresses = {
-  "31337": { address: "${contractAddress}", chainId: 31337, chainName: "hardhat" },
-  "11155111": { address: "0x0000000000000000000000000000000000000000", chainId: 11155111, chainName: "sepolia" }
-};
-`;
-    fs.writeFileSync(frontendAddressesFile, addressesContent);
-    console.log(`✅ Updated frontend addresses: ${frontendAddressesFile}`);
 
     console.log(`\n🎯 Deployment Summary:`);
     console.log(`   Contract: AthleteRegistration`);
